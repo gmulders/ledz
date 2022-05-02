@@ -390,12 +390,12 @@ void ledz_task(void* args)
     int i = 0;
     // int64_t time = esp_timer_get_time();
 	TickType_t block_time = pdMS_TO_TICKS(0);
-	uint32_t code;
+	uint32_t code = 0;
 
 	ESP_LOGI(TAG, "Starting loop");
     while (1) {
 		// Check if there is a new program waiting.
-		if (xTaskNotifyWait(pdFALSE, 0x00, &code,  block_time) == pdPASS) {
+		if (xTaskNotifyWait(0x00, 0xff, &code,  block_time) == pdPASS) {
 		    ESP_LOGI(TAG, "Command received");
 			if (code == PAUSE_TASK) {
 			    ESP_LOGI(TAG, "Pausing Task");
@@ -416,6 +416,7 @@ void ledz_task(void* args)
 			} else {
 				ESP_LOGI(TAG, "Unknown command");
 			}
+            code = 0;
 		}
 
 		if (paused) {
