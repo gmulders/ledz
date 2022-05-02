@@ -62,9 +62,6 @@ void vm_exec(VM *vm, int startip, int startsp) {
 #define OP(x)	&&Label##x
 #include "opcodes.h"
 
-
-//	ESP_LOGI(TAG, "a 5, %p", dispatch[vm->code[ip]]);
-
 	RAW_DISPATCH;                  // jump to first instruction interp code
 
 LABEL(NoOp)
