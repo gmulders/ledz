@@ -347,10 +347,10 @@ LABEL(Return)
 //	printf("ofp: %d\n", ofp);
     fp = vm->stack[sp--];			// restore fp
 //	printf("fp: %d\n", fp);
-    nargs = vm->stack[sp--];		// how many args to throw away?
-//	printf("nargs: %d\n", nargs);
     noargs = vm->stack[sp--];		// how many object args to throw away?
 //	printf("noargs: %d\n", noargs);
+    nargs = vm->stack[sp--];		// how many args to throw away?
+//	printf("nargs: %d\n", nargs);
     sp -= nargs;					// pop args
 //	printf("sp %d\n", sp);
 	osp -= noargs;
