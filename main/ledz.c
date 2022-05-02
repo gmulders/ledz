@@ -200,7 +200,28 @@ static int setW(VM *vm) {
 	return 1;
 }
 
+#define POP_FLOAT			(*((float*)(vm->stack + sp--)))
+#define PUSH_FLOAT(val)		(vm->stack[++sp] = *((int*)(&(val))))
+static int powFn(VM *vm) {
+	int sp = vm->sp;
+	float e = POP_FLOAT;
+	float b = POP_FLOAT;
+    float p = pow(b, e);
+	PUSH_FLOAT(p);
+	vm->sp = sp;
+	return 1;
+}
+
+static int expFn(VM *vm) {
+	int sp = vm->sp;
+	float e = POP_FLOAT;
+    float p = exp(e);
+	PUSH_FLOAT(p);
+	vm->sp = sp;
+	return 1;
+}
 #define START_PROGRAM_SIZE 38
+
 	int start_program[START_PROGRAM_SIZE] = {
 	Call, 7, 2, 1, 0, 0,                    // 0
 	Halt,                                   // 6
@@ -223,7 +244,7 @@ static int setW(VM *vm) {
 	Return, 1,                              // 36
 };
 
-static internal_function fns[8] = { getR, setR, getG, setG, getB, setB, getW, setW };
+static internal_function fns[10] = { getR, setR, getG, setG, getB, setB, getW, setW, powFn, expFn };
 
 // static VM *_vm_create(int *code, int code_size) {
 // 	int *new_code = malloc(code_size * sizeof(int));
