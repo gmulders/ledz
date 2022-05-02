@@ -364,6 +364,13 @@ static void _vm_exec(VM *vm, int counter) {
 	vm_exec(vm, 0, 1);
 }
 
+static void clear_led_data_buffer()
+{
+    for (int l = 0; l < LED_COUNT; l++) {
+        led_data_buffer[l] = color_from_rgbw(0, 0, 0, 0);
+    }
+}
+
 void ledz_task(void* args)
 {
     ESP_LOGI(TAG, "Configuring transmitter");
@@ -371,6 +378,7 @@ void ledz_task(void* args)
 
     // 4 bytes per LED (r, g, b, w)
     led_data_buffer = malloc(LED_COUNT * sizeof(int));
+    clear_led_data_buffer();
 
 	while (xSemaphoreTake(ledzTaskMutex, pdMS_TO_TICKS(250)) != pdTRUE) {
 		ESP_LOGE(TAG, "Could not get lock to vm; retry");
@@ -402,6 +410,7 @@ void ledz_task(void* args)
 					ESP_LOGE(TAG, "Could not get lock to vm");
 					continue;
 				}
+                clear_led_data_buffer();
 				i = 0;
 				paused = 0;
 			} else {
