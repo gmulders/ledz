@@ -209,13 +209,13 @@ LABEL(BranchTrue)
 	TRACE_BEGIN;
 	ia = vm->code[ip++];
 	addr = ip + ia;
-	if (vm->stack[sp--] == true) ip = addr;
+	if (vm->stack[sp--] != 0) ip = addr;
 	DISPATCH;
 LABEL(BranchFalse)
 	TRACE_BEGIN;
 	ia = vm->code[ip++];
 	addr = ip + ia;
-	if (vm->stack[sp--] == false) ip = addr;
+	if (vm->stack[sp--] == 0) ip = addr;
 	DISPATCH;
 LABEL(Halt)
 	TRACE_BEGIN;
