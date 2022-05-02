@@ -412,7 +412,7 @@ LABEL(ArrayLoad)
 	TRACE_BEGIN;
 	ia = POP_INT;
 	oa = vm->object_stack[osp--];
-	ib = *((int *)oa->data + ia);
+    ib = *((int *)oa->data + ia);
 	PUSH_INT(ib);
 	DISPATCH;
 LABEL(ArrayStore)
