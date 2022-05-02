@@ -30,6 +30,10 @@
 #define RAW_DISPATCH	goto *dispatch[vm->code[ip++]]
 #define DISPATCH    	TRACE_END; RAW_DISPATCH
 
+#define TRACE_BEGIN_DEBUG   vm_print_instr(vm->code, ip-1)
+#define TRACE_END_DEBUG    	vm_print_stack(vm->stack, sp)
+#define DISPATCH_DEBUG      TRACE_END_DEBUG; RAW_DISPATCH
+
 #define LABEL(x)        Label##x:
 
 static const char *TAG = "vm";
