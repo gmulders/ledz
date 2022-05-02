@@ -99,7 +99,7 @@ static esp_err_t post_handler(httpd_req_t *req)
 	if (xSemaphoreTake(ledzTaskMutex, pdMS_TO_TICKS(250)) != pdTRUE) {
 		// We could not obtain the semaphore and can therefore not access the shared resource safely.
 		ESP_LOGE(TAG, "Could not get a lock on the vm.");
-        httpd_resp_send_err(r, HTTPD_500_INTERNAL_SERVER_ERROR, "{\"message\": \"Could not get a lock on the vm.\"}")
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "{\"message\": \"Could not get a lock on the vm.\"}");
 		return ESP_FAIL;
 	}
 
