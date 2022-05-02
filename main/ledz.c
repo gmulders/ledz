@@ -220,28 +220,129 @@ static int expFn(VM *vm) {
 	vm->sp = sp;
 	return 1;
 }
-#define START_PROGRAM_SIZE 38
 
+// #define START_PROGRAM_SIZE 38
+// int start_program[START_PROGRAM_SIZE] = {
+// 	Call, 7, 2, 1, 0, 0,                    // 0
+// 	Halt,                                   // 6
+// 	IntConst, 0,                            // 7
+// 	Store, 1,                               // 9
+// 	Load, 1,                                // 11
+// 	Load, -6,                               // 13
+// 	IntLt,                                  // 15
+// 	BranchFalse, 16,                        // 16
+// 	Load, 1,                                // 18
+// 	IntConst, 15,                           // 20
+// 	CallIn, 7,                              // 22
+// 	Pop,                                    // 24
+// 	Load, 1,                                // 25
+// 	IntConst, 1,                            // 27
+// 	IntAdd,                                 // 29
+// 	Store, 1,                               // 30
+// 	Branch, -23,                            // 32
+// 	IntConst, 0,                            // 34
+// 	Return, 1,                              // 36
+// };
+
+#define START_PROGRAM_SIZE 172
 	int start_program[START_PROGRAM_SIZE] = {
-	Call, 7, 2, 1, 0, 0,                    // 0
-	Halt,                                   // 6
-	IntConst, 0,                            // 7
-	Store, 1,                               // 9
-	Load, 1,                                // 11
-	Load, -6,                               // 13
-	IntLt,                                  // 15
-	BranchFalse, 16,                        // 16
-	Load, 1,                                // 18
-	IntConst, 255,                          // 20
-	CallIn, 7,                              // 22
-	Pop,                                    // 24
-	Load, 1,                                // 25
-	IntConst, 1,                            // 27
-	IntAdd,                                 // 29
-	Store, 1,                               // 30
-	Branch, -23,                            // 32
-	IntConst, 0,                            // 34
-	Return, 1,                              // 36
+    DupX1,                                  // 0
+    BranchTrue, 8,                          // 1
+    Dup,                                    // 3
+    Call, 19, 1, 2, 0, 0,                   // 4
+    Pop,                                    // 10
+    Swap,                                   // 11
+    Call, 106, 2, 2, 0, 0,                  // 12
+    Halt,                                   // 18
+    Load, -5,                               // 19
+    NewArray,                               // 21
+    GlobalStoreObject, 0,                   // 22
+    Load, -5,                               // 24
+    IntConst, 2,                            // 26
+    IntDiv,                                 // 28
+    GlobalStore, 0,                         // 29
+    GlobalLoad, 0,                          // 31
+    IntConst, 2,                            // 33
+    IntDiv,                                 // 35
+    Store, 1,                               // 36
+    IntConst, 0,                            // 38
+    Store, 2,                               // 40
+    Load, 2,                                // 42
+    GlobalLoad, 0,                          // 44
+    IntLt,                                  // 46
+    BranchFalse, 30,                        // 47
+    GlobalLoadObject, 0,                    // 49
+    Load, 2,                                // 51
+    Load, 1,                                // 53
+    IntSub,                                 // 55
+    Load, 2,                                // 56
+    Load, 1,                                // 58
+    IntSub,                                 // 60
+    IntMul,                                 // 61
+    IntNeg,                                 // 62
+    Int2Float,                              // 63
+    FloatConst, 1073741824,                 // 64
+    FloatDiv,                               // 66
+    Load, 2,                                // 67
+    ArrayStore,                             // 69
+    Load, 2,                                // 70
+    IntConst, 1,                            // 72
+    IntAdd,                                 // 74
+    Store, 2,                               // 75
+    Branch, -37,                            // 77
+    Load, 2,                                // 79
+    Load, -5,                               // 81
+    IntLt,                                  // 83
+    BranchFalse, 16,                        // 84
+    Load, 2,                                // 86
+    IntConst, 16,                           // 88
+    CallIn, 7,                              // 90
+    Pop,                                    // 92
+    Load, 2,                                // 93
+    IntConst, 1,                            // 95
+    IntAdd,                                 // 97
+    Store, 2,                               // 98
+    Branch, -23,                            // 100
+    IntConst, 0,                            // 102
+    Return, 1,                              // 104
+    FloatConst, 1176256512,                 // 106
+    FloatConst, 1045220557,                 // 108
+    Load, -5,                               // 110
+    Int2Float,                              // 112
+    FloatConst, 1050253722,                 // 113
+    CallIn, 8,                              // 115
+    CallIn, 8,                              // 117
+    FloatMul,                               // 119
+    Store, 1,                               // 120
+    Load, 1,                                // 122
+    Load, 1,                                // 124
+    FloatMul,                               // 126
+    Store, 1,                               // 127
+    IntConst, 0,                            // 129
+    Store, 2,                               // 131
+    Load, 2,                                // 133
+    GlobalLoad, 0,                          // 135
+    IntLt,                                  // 137
+    BranchFalse, 28,                        // 138
+    Load, 2,                                // 140
+    FloatConst, 1132396544,                 // 142
+    GlobalLoadObject, 0,                    // 144
+    Load, 2,                                // 146
+    ArrayLoad,                              // 148
+    Load, 1,                                // 149
+    FloatDiv,                               // 151
+    CallIn, 9,                              // 152
+    FloatMul,                               // 154
+    Float2Int,                              // 155
+    CallIn, 1,                              // 156
+    Pop,                                    // 158
+    Load, 2,                                // 159
+    IntConst, 1,                            // 161
+    IntAdd,                                 // 163
+    Store, 2,                               // 164
+    Branch, -35,                            // 166
+    IntConst, 0,                            // 168
+    Return, 1,                              // 170
 };
 
 static internal_function fns[10] = { getR, setR, getG, setG, getB, setB, getW, setW, powFn, expFn };
