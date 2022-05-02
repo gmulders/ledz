@@ -96,7 +96,7 @@ LABEL(IntMod)
 LABEL(IntNeg)
 	TRACE_BEGIN;
 	ia = POP_INT;
-	PUSH_INT(-fa);
+	PUSH_INT(-ia);
 	DISPATCH;
 LABEL(IntLt)
 	TRACE_BEGIN;
