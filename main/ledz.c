@@ -11,8 +11,7 @@
 
 static const char *TAG = "ledz";
 
-//#define LED_COUNT (4 * 144)
-#define LED_COUNT (488)
+#define LED_COUNT (470) // 2 * (3 * 72 + 19)
 #define BYTES_PER_LED 4
 #define BITS_PER_LED (BYTES_PER_LED * 8)
 
@@ -26,12 +25,19 @@ static const uint8_t clock_divider = 4;
 // #define T1L 450
 // #define TRST 55000
 
-// These are the timings for SK6812RGBW
+// These are the tweaked timings for SK6812RGBW
 #define T0H 300	
 #define T0L 850
 #define T1H 600
 #define T1L 450
 #define TRST 55000
+
+// These are the official timings for SK6812RGBW
+// #define T0H 300	
+// #define T0L 900
+// #define T1H 600
+// #define T1L 600
+// #define TRST 80000
 
 static const rmt_item32_t lo = {
     .duration0 = (T0H / (clock_divider * pulse_width)),
