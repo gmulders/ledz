@@ -134,7 +134,7 @@ static int setR(VM *vm) {
 	int sp = vm->sp;
 	int r = vm->stack[sp--];
 	int i = vm->stack[sp--];
-	led_data_buffer[i].r = r;
+	led_data_buffer[i].r = r & 0xff;
 	vm->stack[++sp] = 1;
 	vm->sp = sp;
 	return 1;
@@ -152,7 +152,7 @@ static int setG(VM *vm) {
 	int sp = vm->sp;
 	int g = vm->stack[sp--];
 	int i = vm->stack[sp--];
-	led_data_buffer[i].g = g;
+	led_data_buffer[i].g = g & 0xff;
 	vm->stack[++sp] = 1;
 	vm->sp = sp;
 	return 1;
@@ -170,7 +170,7 @@ static int setB(VM *vm) {
 	int sp = vm->sp;
 	int b = vm->stack[sp--];
 	int i = vm->stack[sp--];
-	led_data_buffer[i].b = b;
+	led_data_buffer[i].b = b & 0xff;
 	vm->stack[++sp] = 1;
 	vm->sp = sp;
 	return 1;
@@ -188,7 +188,7 @@ static int setW(VM *vm) {
 	int sp = vm->sp;
 	int w = vm->stack[sp--];
 	int i = vm->stack[sp--];
-	led_data_buffer[i].w = w;
+	led_data_buffer[i].w = w & 0xff;
 	vm->stack[++sp] = 1;
 	vm->sp = sp;
 	return 1;
