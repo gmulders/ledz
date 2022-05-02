@@ -388,7 +388,7 @@ void ledz_task(void* args)
 	
 	int paused = 0;
     int i = 0;
-    int64_t time = esp_timer_get_time();
+    // int64_t time = esp_timer_get_time();
 	TickType_t block_time = pdMS_TO_TICKS(0);
 	uint32_t code;
 
@@ -427,27 +427,8 @@ void ledz_task(void* args)
 
         // Pak het programma en vul de led_data_buffer en de xDelay
         // for (int l = 0; l < LED_COUNT; l++) {
-        //     color_t c;
-        //     switch (currentProgram)
-        //     {
-        //     case PROGRAM_WHITE:
-        //         c = color_from_rgbw(0, 0, 0, i & 0xff);
-        //         break;
-
-        //     case PROGRAM_RAINBOW:
-        //         c = rainbow(l, i);
-        //         break;
-
-        //     default:
-        //         c = color_from_rgbw(0, 0, 0, 0);
-        //         break;
-        //     }
-
-		// 	led_data_buffer[l] = c;
-        //     // led_data_buffer[l * 4 + 0] = c.r;
-        //     // led_data_buffer[l * 4 + 1] = c.g;
-        //     // led_data_buffer[l * 4 + 2] = c.b;
-        //     // led_data_buffer[l * 4 + 3] = c.w;
+        //     color_t c = color_from_rgbw(0, 0, 0, i & 0xff);
+		// 	   led_data_buffer[l] = c;
         // }
         ESP_ERROR_CHECK(rmt_write_sample(RMT_CHANNEL_0, (uint8_t *)led_data_buffer, LED_COUNT * 4, true));
         ESP_ERROR_CHECK(rmt_write_items(RMT_CHANNEL_0, &reset, 1, true));
@@ -469,7 +450,8 @@ void ledz_task(void* args)
 		// 	// default:			46.370720 (this is lower than white, probably because the switch 'default' label is more expensive)
         // }
 
-//        vTaskDelay(xDelay);
+        // const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
+        // vTaskDelay(xDelay);
     }
 
 	vm_free(vm);
