@@ -60,7 +60,19 @@ static const rmt_item32_t reset = {
     .level1 = 0,
 };
 
-static void rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size, size_t wanted_num, size_t *translated_size, size_t *item_num)
+static inline void write_color_channel(uint8_t value, rmt_item32_t *dest) {
+    for (int i = 0; i < 8; i++)
+    {
+        // MSB first
+        if (value & (1 << (7 - i)))
+            dest->val = hi.val;
+        else
+            dest->val = lo.val;
+        dest++;
+    }
+}
+
+static void sample_to_rmt(const void *src, rmt_item32_t *dest, size_t src_size, size_t wanted_num, size_t *translated_size, size_t *item_num)
 {
     if (src == NULL || dest == NULL)
     {
@@ -70,25 +82,20 @@ static void rmt_adapter(const void *src, rmt_item32_t *dest, size_t src_size, si
     }
     size_t size = 0;
     size_t num = 0;
-    uint8_t *psrc = (uint8_t *)src;
-    rmt_item32_t *pdest = dest;
+    color_t *psrc = (color_t *)src;
     while (size < src_size && num < wanted_num)
     {
-        for (int i = 0; i < 8; i++)
-        {
-            // MSB first
-            if (*psrc & (1 << (7 - i)))
-            {
-                pdest->val = hi.val;
-            }
-            else
-            {
-                pdest->val = lo.val;
-            }
-            num++;
-            pdest++;
-        }
-        size++;
+        // Note that the order for the (my?) SK6812RGBW is GRBW
+        write_color_channel(psrc->g, dest);
+        dest += 8;
+        write_color_channel(psrc->r, dest);
+        dest += 8;
+        write_color_channel(psrc->b, dest);
+        dest += 8;
+        write_color_channel(psrc->w, dest);
+        dest += 8;
+        num += 32;
+        size+=4;
         psrc++;
     }
     *translated_size = size;
@@ -120,7 +127,7 @@ static void rmt_tx_init(void)
 
     ESP_ERROR_CHECK(rmt_config(&config));
     ESP_ERROR_CHECK(rmt_driver_install(config.channel, 0, 0));
-    ESP_ERROR_CHECK(rmt_translator_init(config.channel, rmt_adapter));
+    ESP_ERROR_CHECK(rmt_translator_init(config.channel, sample_to_rmt));
 }
 
 #define PROGRAM_RAINBOW 0
@@ -245,7 +252,7 @@ static int expFn(VM *vm) {
 // };
 
 #define START_PROGRAM_SIZE 172
-	int start_program[START_PROGRAM_SIZE] = {
+int start_program[START_PROGRAM_SIZE] = {
     DupX1,                                  // 0
     BranchTrue, 8,                          // 1
     Dup,                                    // 3
