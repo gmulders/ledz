@@ -5,3 +5,5 @@ temp/
 debug.log
 sdkconfig.old
 main/vmtest.c
+front-end/elm-stuff
+front-end/app.js
