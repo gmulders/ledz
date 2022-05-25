@@ -228,6 +228,58 @@ static int expFn(VM *vm) {
 	return 1;
 }
 
+static int sinFn(VM *vm) {
+	int sp = vm->sp;
+	float a = POP_FLOAT;
+    float s = sin(a);
+	PUSH_FLOAT(s);
+	vm->sp = sp;
+	return 1;
+}
+
+static int cosFn(VM *vm) {
+	int sp = vm->sp;
+	float a = POP_FLOAT;
+    float c = cos(a);
+	PUSH_FLOAT(c);
+	vm->sp = sp;
+	return 1;
+}
+
+static int sqrtFn(VM *vm) {
+	int sp = vm->sp;
+	float a = POP_FLOAT;
+    float s = sqrt(a);
+	PUSH_FLOAT(s);
+	vm->sp = sp;
+	return 1;
+}
+
+// Sets the color to the given HSV color.
+static int setHSV(VM *vm) {
+	int sp = vm->sp;
+	float v = POP_FLOAT;
+	float s = POP_FLOAT;
+	float h = POP_FLOAT;
+	int i = vm->stack[sp--];
+
+    // The params are:
+    // hue: The hue, [0, 360)
+    // sat: The saturation, [0, 1)
+    // val: The value, [0, 1)
+
+    if (h < 0 || h >= 360.0) h = 0;
+    if (s < 0) s = 0;
+    if (s >= 1.0) s = 0.99999;     
+    if (v < 0) v = 0;
+    if (v >= 1.0) v = 0.99999;     
+
+	led_data_buffer[i] = hsv2rgb(h, s, v);
+	vm->stack[++sp] = 1;
+	vm->sp = sp;
+	return 1;
+}
+
 // #define START_PROGRAM_SIZE 38
 // int start_program[START_PROGRAM_SIZE] = {
 // 	Call, 7, 2, 1, 0, 0,                    // 0
@@ -352,7 +404,7 @@ int start_program[START_PROGRAM_SIZE] = {
     Return, 1,                              // 170
 };
 
-static internal_function fns[10] = { getR, setR, getG, setG, getB, setB, getW, setW, powFn, expFn };
+static internal_function fns[14] = { getR, setR, getG, setG, getB, setB, getW, setW, powFn, expFn, sinFn, cosFn, sqrtFn, setHSV };
 
 // static VM *_vm_create(int *code, int code_size) {
 // 	int *new_code = malloc(code_size * sizeof(int));
