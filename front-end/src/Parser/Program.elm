@@ -1,199 +1,389 @@
-module Parser.Program exposing (LampProgram, programParser)
+module Parser.Program exposing
+    ( BinaryExpression(..)
+    , CallExpr(..)
+    , Expr(..)
+    , Function(..)
+    , LampProgramTree(..)
+    , Statement(..)
+    , Type(..)
+    , UnaryExpression(..)
+    , Variable(..)
+    , programParser
+    )
 
 import Parser exposing (..)
+import Parser.Expression exposing (..)
 import Parser.Extra exposing (..)
 import Parser.Extras exposing (..)
-import Parser.Expression exposing (..)
 import Set
 
+
 type Function
-  = Function String (List Variable) Type (List Variable) (List Statement)
+    = Function String (List Variable) Type (List Variable) (List Statement)
+
 
 type Variable
-  = Variable String Type
+    = Variable String Type
 
-type LampProgram
-  = LampProgram (List Variable) (List Function)
+
+type LampProgramTree
+    = LampProgram (List Variable) (List Function)
+
 
 type Type
-  = Integer
-  | Float
-  | IntegerArray
-  | FloatArray
+    = Integer
+    | Float
+    | IntegerArray
+    | FloatArray
+
 
 type Statement
-  = ExpressionStatement Expr
-  | IfStatement Expr (List Statement)
-  | IfElseStatement Expr (List Statement) (List Statement)
-  | WhileStatement Expr (List Statement)
-  | Assignment String Expr
-  | ArrayAssignment String Expr Expr
-  | CreateArrayAssignment String Type Expr
-  | EchoStatement Expr
-  | ReturnStatement Expr
+    = CallStatement CallExpr
+    | IfStatement Expr (List Statement)
+    | IfElseStatement Expr (List Statement) (List Statement)
+    | WhileStatement Expr (List Statement)
+    | Assignment String Expr
+    | ArrayAssignment String Expr Expr
+    | CreateArrayAssignment String Type Expr
+    | EchoStatement Expr
+    | ReturnStatement Expr
+
+
+type CallExpr
+    = CallByName String (List Expr)
+
 
 type Expr
-  = IfExpr
-  | CallExpr
-  | VariableExpr Variable
-  | IntExpr Int
-  | FloatExpr Float
-  | IndexExpr
-  | BinaryExpression BinaryExpression
-  | UnaryExpression UnaryExpression
+    = IfExpr
+    | CallExpr CallExpr
+    | VariableExpr String
+    | IntExpr Int
+    | FloatExpr Float
+    | IndexExpr Expr Expr
+    | BinaryExpression BinaryExpression
+    | UnaryExpression UnaryExpression
+
 
 type BinaryExpression
-  = AndExpr Expr Expr
-  | OrExpr Expr Expr
-  | LessThanExpr Expr Expr
-  | LessThanEqualsExpr Expr Expr
-  | GreaterThanEqualsExpr Expr Expr
-  | GreaterThanExpr Expr Expr
-  | EqualsExpr Expr Expr
-  | NotEqualsExpr Expr Expr
-  | AddExpr Expr Expr
-  | SubtractExpr Expr Expr
-  | MultiplyExpr Expr Expr
-  | DivideExpr Expr Expr
-  | ModuloExpr Expr Expr
+    = AndExpr Expr Expr
+    | OrExpr Expr Expr
+    | LessThanExpr Expr Expr
+    | LessThanEqualsExpr Expr Expr
+    | GreaterThanEqualsExpr Expr Expr
+    | GreaterThanExpr Expr Expr
+    | EqualsExpr Expr Expr
+    | NotEqualsExpr Expr Expr
+    | AddExpr Expr Expr
+    | SubtractExpr Expr Expr
+    | MultiplyExpr Expr Expr
+    | DivideExpr Expr Expr
+    | ModuloExpr Expr Expr
+
 
 type UnaryExpression
-  = NegativeExpr Expr
-  | NotExpr Expr
+    = NegativeExpr Expr
+    | NotExpr Expr
+
 
 identifier : Parser String
 identifier =
-  Parser.variable
-    { start = Char.isLower
-    , inner = \c -> Char.isAlphaNum c || c == '_'
-    , reserved = Set.fromList []
-    }
+    Parser.variable
+        { start = Char.isLower
+        , inner = \c -> Char.isAlphaNum c || c == '_'
+        , reserved = Set.fromList [ "while", "if", "return" ]
+        }
+        |. spaces
+
 
 typea : Parser Type
 typea =
-  oneOf
-    [ succeed Integer |. keyword "Int"
-    , succeed Float |. keyword "Float"
-    , succeed IntegerArray |. keyword "IntegerArray"
-    , succeed FloatArray |. keyword "FloatArray"
-    ]
+    oneOf
+        [ succeed Integer |. keyword "Int"
+        , succeed Float |. keyword "Float"
+        , succeed IntegerArray |. keyword "IntegerArray"
+        , succeed FloatArray |. keyword "FloatArray"
+        ]
+
+
+arrayType : Parser Type
+arrayType =
+    oneOf
+        [ succeed IntegerArray |. keyword "IntegerArray"
+        , succeed FloatArray |. keyword "FloatArray"
+        ]
+        |. spaces
+
 
 variable : Parser Variable
 variable =
-  succeed Variable
-    |= identifier
-    |. spaces
-    |. symbol ":"
-    |. spaces
-    |= typea
+    succeed Variable
+        |= identifier
+        |. symbolSpaces ":"
+        |= typea
+
 
 variableDeclaration : Parser Variable
 variableDeclaration =
-  succeed identity
-    |. keyword "var"
-    |. spaces
-    |= variable
+    succeed identity
+        |. keyword "var"
+        |. spaces
+        |= variable
+
 
 declarations : Parser (List Variable)
 declarations =
-  many variableDeclaration
+    many variableDeclaration
+
 
 parameterList : Parser (List Variable)
 parameterList =
-  Parser.sequence
-    { start = "("
-    , separator = ","
-    , end = ")"
-    , spaces = spaces
-    , item = variable
-    , trailing = Forbidden -- demand a trailing semi-colon
-    }
+    Parser.sequence
+        { start = "("
+        , separator = ","
+        , end = ")"
+        , spaces = spaces
+        , item = variable
+        , trailing = Forbidden
+        }
+
 
 expression : Parser Expr
 expression =
-  problem "expr"
+    buildExpressionParser operators (lazy <| \_ -> term)
 
-assignment : Parser Statement
-assignment =
-  succeed Assignment
-    |= identifier
-    |. spaces
-    |. symbol "="
-    |. spaces
-    |= expression
+
+assignmentOrCall : Parser Statement
+assignmentOrCall =
+    succeed (\id fn -> fn id)
+        |= identifier
+        |= oneOf
+            [ succeed (\b c a -> ArrayAssignment a b c)
+                |. symbolSpaces "["
+                |= expression
+                |. spaces
+                |. symbolSpaces "]"
+                |. symbolSpaces "="
+                |= expression
+            , succeed (\es id -> CallStatement (CallByName id es))
+                |= exprList
+            , succeed identity
+                |. symbolSpaces "="
+                |= oneOf
+                    [ succeed (flip Assignment)
+                        |= expression
+                    , succeed (\b c a -> CreateArrayAssignment a b c)
+                        |= arrayType
+                        |. symbolSpaces "["
+                        |= expression
+                        |. spaces
+                        |. symbolSpaces "]"
+                    ]
+            ]
+        |. symbol ";"
+
+
+statementBlock : Parser (List Statement)
+statementBlock =
+    succeed identity
+        |. symbolSpaces "{"
+        |= (lazy <| \_ -> statements)
+        |. spaces
+        |. symbolSpaces "}"
+
+
+ifElseStatement : Parser Statement
+ifElseStatement =
+    succeed (\c t fn -> fn c t)
+        |. keyword "if"
+        |. spaces
+        |. symbolSpaces "("
+        |= expression
+        |. spaces
+        |. symbolSpaces ")"
+        |= statementBlock
+        |= oneOf
+            [ succeed (\f c t -> IfElseStatement c t f)
+                |. keyword "else"
+                |. spaces
+                |= statementBlock
+            , succeed IfStatement
+            ]
+
+
+whileStatement : Parser Statement
+whileStatement =
+    succeed WhileStatement
+        |. keyword "while"
+        |. spaces
+        |. symbolSpaces "("
+        |= expression
+        |. spaces
+        |. symbolSpaces ")"
+        |= statementBlock
+
+
+returnStatement : Parser Statement
+returnStatement =
+    succeed ReturnStatement
+        |. keyword "return"
+        |. spaces
+        |= expression
+        |. spaces
+        |. symbolSpaces ";"
+
 
 statement : Parser Statement
-statement = 
-  oneOf
-    [ assignment
-    ]
+statement =
+    oneOf
+        [ assignmentOrCall
+        , ifElseStatement
+        , whileStatement
+        , returnStatement
+        ]
+
 
 statements : Parser (List Statement)
 statements =
-  many statement
+    many statement
+
 
 function : Parser Function
 function =
-  succeed Function
-    |. keyword "fun"
-    |. spaces
-    |= identifier
-    |. spaces
-    |= parameterList
-    |. spaces
-    |. symbol ":"
-    |. spaces
-    |= typea
-    |. spaces
-    |. symbol "{"
-    |. spaces
-    |= declarations
-    |. spaces
-    |= statements
-    |. spaces
-    |. symbol "}"
+    succeed Function
+        |. keyword "fun"
+        |. spaces
+        |= identifier
+        |= parameterList
+        |. spaces
+        |. symbolSpaces ":"
+        |= typea
+        |. spaces
+        |. symbolSpaces "{"
+        |= declarations
+        |. spaces
+        |= statements
+        |. spaces
+        |. symbolSpaces "}"
 
 
 functions : Parser (List Function)
 functions =
-  some function |> map (\(v, vl) -> v :: vl)
+    some function |> map (\( v, vl ) -> v :: vl)
 
-programParser : Parser LampProgram
+
+programParser : Parser LampProgramTree
 programParser =
-  succeed LampProgram
-    |= declarations
-    |= functions
-    |. end
+    succeed LampProgram
+        |= declarations
+        |= functions
+        |. end
 
 
+binExpr : (Expr -> Expr -> BinaryExpression) -> Expr -> Expr -> Expr
+binExpr f l r =
+    f l r |> BinaryExpression
 
--- assoc : (a -> b -> c) -> (c -> d) -> a -> b -> d
--- assoc =
---   (>>) (>>)
-
-compose3 : (a -> b -> c) -> (c -> d) -> a -> b -> d
-compose3 f g l r =
-  g (f l r)
 
 operators : OperatorTable Expr
 operators =
-    [ --[ prefixOperator negate (symbol "-"), prefixOperator identity (symbol "+") ]
-     [ infixOperator (compose3 MultiplyExpr BinaryExpression) (symbol "*") AssocLeft ]
---    , [ infixOperator (+) (symbol "+") AssocLeft, infixOperator (-) (symbol "-") AssocLeft ]
+    [ [ prefixOperator (NegativeExpr >> UnaryExpression) (symbol "-")
+      , prefixOperator (NotExpr >> UnaryExpression) (symbol "!")
+      , prefixOperator identity (symbol "+")
+      ]
+    , [ infixOperator (binExpr MultiplyExpr) (symbol "*") AssocLeft
+      , infixOperator (binExpr DivideExpr) (symbol "/") AssocLeft
+      , infixOperator (binExpr ModuloExpr) (symbol "%") AssocLeft
+      ]
+    , [ infixOperator (binExpr AddExpr) (symbol "+") AssocLeft
+      , infixOperator (binExpr SubtractExpr) (symbol "-") AssocLeft
+      ]
+    , [ infixOperator (binExpr LessThanExpr) (symbol "<") AssocLeft
+      , infixOperator (binExpr LessThanEqualsExpr) (symbol "<=") AssocLeft
+      , infixOperator (binExpr GreaterThanEqualsExpr) (symbol ">=") AssocLeft
+      , infixOperator (binExpr GreaterThanExpr) (symbol ">") AssocLeft
+      , infixOperator (binExpr EqualsExpr) (symbol "==") AssocLeft
+      , infixOperator (binExpr NotEqualsExpr) (symbol "!=") AssocLeft
+      ]
+    , [ infixOperator (binExpr AndExpr) (symbol "&&") AssocLeft
+      ]
+    , [ infixOperator (binExpr OrExpr) (symbol "||") AssocLeft
+      ]
     ]
+
+
+primary : Parser Expr
+primary =
+    number
+        { int = Just IntExpr
+        , hex = Nothing
+        , octal = Nothing
+        , binary = Nothing
+        , float = Just FloatExpr
+        }
+        |. spaces
+
+
+exprList : Parser (List Expr)
+exprList =
+    Parser.sequence
+        { start = "("
+        , separator = ","
+        , end = ")"
+        , spaces = spaces
+        , item = lazy <| \_ -> expression
+        , trailing = Forbidden -- demand a trailing semi-colon
+        }
+
+
+identifierMember : Parser Expr
+identifierMember =
+    succeed (\id fn -> fn id)
+        |= identifier
+        |= oneOf
+            [ succeed (\es id -> CallExpr (CallByName id es))
+                |= exprList
+            , succeed VariableExpr
+            ]
+
+
+member : Parser Expr
+member =
+    oneOf
+        [ identifierMember
+        , succeed identity
+            |. symbolSpaces "("
+            |= (lazy <| \_ -> expression)
+            |. symbolSpaces ")"
+        ]
+
+
+memberTerm : Parser Expr
+memberTerm =
+    succeed (\m fn -> fn m)
+        |= member
+        |= oneOf
+            [ succeed (flip IndexExpr)
+                |. symbolSpaces "["
+                |= expression
+                |. symbolSpaces "]"
+            , succeed identity
+            ]
+
 
 term : Parser Expr
 term =
     oneOf
-        [ parens <| lazy (\_ -> expr)
-        , succeed IntExpr
-            |= int
-            |. spaces
-        , succeed FloatExpr
-            |= float
-            |. spaces
+        [ memberTerm
+        , primary
         ]
 
-expr : Parser Expr
-expr =
-    buildExpressionParser operators (lazy <| \_ -> term)
+
+flip : (a -> b -> c) -> b -> a -> c
+flip fn b a =
+    fn a b
+
+
+symbolSpaces : String -> Parser ()
+symbolSpaces s =
+    symbol s
+        |. spaces
