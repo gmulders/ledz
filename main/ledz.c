@@ -135,6 +135,16 @@ static void rmt_tx_init(void)
 
 static color_t *led_data_buffer;
 
+static inline int roundC(int c) {
+    if (c < 0) {
+        return 0;
+    } else if (c > 255) {
+        return 255;
+    } else {
+        return c;
+    }
+}
+
 static int getR(VM *vm) {
 	int sp = vm->sp;
 	int i = vm->stack[sp--];
@@ -147,7 +157,7 @@ static int setR(VM *vm) {
 	int sp = vm->sp;
 	int r = vm->stack[sp--];
 	int i = vm->stack[sp--];
-	led_data_buffer[i].r = r & 0xff;
+	led_data_buffer[i].r = roundC(r);
 	vm->stack[++sp] = 1;
 	vm->sp = sp;
 	return 1;
@@ -165,7 +175,7 @@ static int setG(VM *vm) {
 	int sp = vm->sp;
 	int g = vm->stack[sp--];
 	int i = vm->stack[sp--];
-	led_data_buffer[i].g = g & 0xff;
+	led_data_buffer[i].g = roundC(g);
 	vm->stack[++sp] = 1;
 	vm->sp = sp;
 	return 1;
@@ -183,7 +193,7 @@ static int setB(VM *vm) {
 	int sp = vm->sp;
 	int b = vm->stack[sp--];
 	int i = vm->stack[sp--];
-	led_data_buffer[i].b = b & 0xff;
+	led_data_buffer[i].b = roundC(b);
 	vm->stack[++sp] = 1;
 	vm->sp = sp;
 	return 1;
@@ -201,7 +211,7 @@ static int setW(VM *vm) {
 	int sp = vm->sp;
 	int w = vm->stack[sp--];
 	int i = vm->stack[sp--];
-	led_data_buffer[i].w = w & 0xff;
+	led_data_buffer[i].w = roundC(w);
 	vm->stack[++sp] = 1;
 	vm->sp = sp;
 	return 1;
