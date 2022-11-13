@@ -313,105 +313,249 @@ static int setHSV(VM *vm) {
 // 	Return, 1,                              // 36
 // };
 
-#define START_PROGRAM_SIZE 172
+// #define START_PROGRAM_SIZE 172
+// int start_program[START_PROGRAM_SIZE] = {
+//     DupX1,                                  // 0
+//     BranchTrue, 8,                          // 1
+//     Dup,                                    // 3
+//     Call, 19, 1, 2, 0, 0,                   // 4
+//     Pop,                                    // 10
+//     Swap,                                   // 11
+//     Call, 106, 2, 2, 0, 0,                  // 12
+//     Halt,                                   // 18
+//     Load, -5,                               // 19
+//     NewArray,                               // 21
+//     GlobalStoreObject, 0,                   // 22
+//     Load, -5,                               // 24
+//     IntConst, 2,                            // 26
+//     IntDiv,                                 // 28
+//     GlobalStore, 0,                         // 29
+//     GlobalLoad, 0,                          // 31
+//     IntConst, 2,                            // 33
+//     IntDiv,                                 // 35
+//     Store, 1,                               // 36
+//     IntConst, 0,                            // 38
+//     Store, 2,                               // 40
+//     Load, 2,                                // 42
+//     GlobalLoad, 0,                          // 44
+//     IntLt,                                  // 46
+//     BranchFalse, 30,                        // 47
+//     GlobalLoadObject, 0,                    // 49
+//     Load, 2,                                // 51
+//     Load, 1,                                // 53
+//     IntSub,                                 // 55
+//     Load, 2,                                // 56
+//     Load, 1,                                // 58
+//     IntSub,                                 // 60
+//     IntMul,                                 // 61
+//     IntNeg,                                 // 62
+//     Int2Float,                              // 63
+//     FloatConst, 1073741824,                 // 64
+//     FloatDiv,                               // 66
+//     Load, 2,                                // 67
+//     ArrayStore,                             // 69
+//     Load, 2,                                // 70
+//     IntConst, 1,                            // 72
+//     IntAdd,                                 // 74
+//     Store, 2,                               // 75
+//     Branch, -37,                            // 77
+//     Load, 2,                                // 79
+//     Load, -5,                               // 81
+//     IntLt,                                  // 83
+//     BranchFalse, 16,                        // 84
+//     Load, 2,                                // 86
+//     IntConst, 16,                           // 88
+//     CallIn, 7,                              // 90
+//     Pop,                                    // 92
+//     Load, 2,                                // 93
+//     IntConst, 1,                            // 95
+//     IntAdd,                                 // 97
+//     Store, 2,                               // 98
+//     Branch, -23,                            // 100
+//     IntConst, 0,                            // 102
+//     Return, 1,                              // 104
+//     FloatConst, 1176256512,                 // 106
+//     FloatConst, 1045220557,                 // 108
+//     Load, -5,                               // 110
+//     Int2Float,                              // 112
+//     FloatConst, 1050253722,                 // 113
+//     CallIn, 8,                              // 115
+//     CallIn, 8,                              // 117
+//     FloatMul,                               // 119
+//     Store, 1,                               // 120
+//     Load, 1,                                // 122
+//     Load, 1,                                // 124
+//     FloatMul,                               // 126
+//     Store, 1,                               // 127
+//     IntConst, 0,                            // 129
+//     Store, 2,                               // 131
+//     Load, 2,                                // 133
+//     GlobalLoad, 0,                          // 135
+//     IntLt,                                  // 137
+//     BranchFalse, 28,                        // 138
+//     Load, 2,                                // 140
+//     FloatConst, 1132396544,                 // 142
+//     GlobalLoadObject, 0,                    // 144
+//     Load, 2,                                // 146
+//     ArrayLoad,                              // 148
+//     Load, 1,                                // 149
+//     FloatDiv,                               // 151
+//     CallIn, 9,                              // 152
+//     FloatMul,                               // 154
+//     Float2Int,                              // 155
+//     CallIn, 1,                              // 156
+//     Pop,                                    // 158
+//     Load, 2,                                // 159
+//     IntConst, 1,                            // 161
+//     IntAdd,                                 // 163
+//     Store, 2,                               // 164
+//     Branch, -35,                            // 166
+//     IntConst, 0,                            // 168
+//     Return, 1,                              // 170
+// };
+
+#define START_PROGRAM_SIZE 241
 int start_program[START_PROGRAM_SIZE] = {
     DupX1,                                  // 0
     BranchTrue, 8,                          // 1
     Dup,                                    // 3
-    Call, 19, 1, 2, 0, 0,                   // 4
+    Call, 158, 1, 1, 0, 0,                  // 4
     Pop,                                    // 10
     Swap,                                   // 11
-    Call, 106, 2, 2, 0, 0,                  // 12
+    Call, 19, 2, 7, 0, 0,                   // 12
     Halt,                                   // 18
-    Load, -5,                               // 19
-    NewArray,                               // 21
-    GlobalStoreObject, 0,                   // 22
+    IntConst, 20,                           // 19
+    Int2Float,                              // 21
+    Store, 2,                               // 22
     Load, -5,                               // 24
-    IntConst, 2,                            // 26
-    IntDiv,                                 // 28
-    GlobalStore, 0,                         // 29
-    GlobalLoad, 0,                          // 31
-    IntConst, 2,                            // 33
-    IntDiv,                                 // 35
-    Store, 1,                               // 36
-    IntConst, 0,                            // 38
-    Store, 2,                               // 40
-    Load, 2,                                // 42
-    GlobalLoad, 0,                          // 44
-    IntLt,                                  // 46
-    BranchFalse, 30,                        // 47
-    GlobalLoadObject, 0,                    // 49
-    Load, 2,                                // 51
-    Load, 1,                                // 53
-    IntSub,                                 // 55
-    Load, 2,                                // 56
-    Load, 1,                                // 58
-    IntSub,                                 // 60
-    IntMul,                                 // 61
-    IntNeg,                                 // 62
-    Int2Float,                              // 63
-    FloatConst, 1073741824,                 // 64
-    FloatDiv,                               // 66
-    Load, 2,                                // 67
-    ArrayStore,                             // 69
-    Load, 2,                                // 70
-    IntConst, 1,                            // 72
-    IntAdd,                                 // 74
-    Store, 2,                               // 75
-    Branch, -37,                            // 77
-    Load, 2,                                // 79
-    Load, -5,                               // 81
-    IntLt,                                  // 83
-    BranchFalse, 16,                        // 84
-    Load, 2,                                // 86
-    IntConst, 16,                           // 88
-    CallIn, 7,                              // 90
-    Pop,                                    // 92
-    Load, 2,                                // 93
-    IntConst, 1,                            // 95
-    IntAdd,                                 // 97
-    Store, 2,                               // 98
-    Branch, -23,                            // 100
-    IntConst, 0,                            // 102
-    Return, 1,                              // 104
-    FloatConst, 1176256512,                 // 106
-    FloatConst, 1045220557,                 // 108
-    Load, -5,                               // 110
-    Int2Float,                              // 112
-    FloatConst, 1050253722,                 // 113
-    CallIn, 8,                              // 115
-    CallIn, 8,                              // 117
-    FloatMul,                               // 119
-    Store, 1,                               // 120
-    Load, 1,                                // 122
-    Load, 1,                                // 124
-    FloatMul,                               // 126
-    Store, 1,                               // 127
-    IntConst, 0,                            // 129
-    Store, 2,                               // 131
-    Load, 2,                                // 133
-    GlobalLoad, 0,                          // 135
-    IntLt,                                  // 137
-    BranchFalse, 28,                        // 138
-    Load, 2,                                // 140
-    FloatConst, 1132396544,                 // 142
-    GlobalLoadObject, 0,                    // 144
-    Load, 2,                                // 146
-    ArrayLoad,                              // 148
-    Load, 1,                                // 149
-    FloatDiv,                               // 151
-    CallIn, 9,                              // 152
-    FloatMul,                               // 154
-    Float2Int,                              // 155
-    CallIn, 1,                              // 156
-    Pop,                                    // 158
-    Load, 2,                                // 159
-    IntConst, 1,                            // 161
-    IntAdd,                                 // 163
-    Store, 2,                               // 164
-    Branch, -35,                            // 166
-    IntConst, 0,                            // 168
-    Return, 1,                              // 170
+    Int2Float,                              // 26
+    FloatConst, 1017370378,                 // 27
+    FloatMul,                               // 29
+    Store, 7,                               // 30
+    FloatConst, 1061997773,                 // 32
+    Load, 7,                                // 34
+    IntConst, 4,                            // 36
+    Int2Float,                              // 38
+    FloatDiv,                               // 39
+    CallIn, 10,                             // 40
+    FloatMul,                               // 42
+    Store, 4,                               // 43
+    FloatConst, 1061997773,                 // 45
+    Load, 7,                                // 47
+    IntConst, 3,                            // 49
+    Int2Float,                              // 51
+    FloatDiv,                               // 52
+    CallIn, 11,                             // 53
+    FloatMul,                               // 55
+    Store, 6,                               // 56
+    IntConst, 0,                            // 58
+    Store, 1,                               // 60
+    Load, 1,                                // 62
+    GlobalLoad, 0,                          // 64
+    IntLt,                                  // 66
+    BranchFalse, 85,                        // 67
+    Load, 1,                                // 69
+    Int2Float,                              // 71
+    Load, 2,                                // 72
+    FloatDiv,                               // 74
+    Load, 7,                                // 75
+    FloatAdd,                               // 77
+    FloatConst, 1073741824,                 // 78
+    FloatDiv,                               // 80
+    CallIn, 10,                             // 81
+    Store, 3,                               // 83
+    Load, 1,                                // 85
+    Int2Float,                              // 87
+    Load, 2,                                // 88
+    FloatDiv,                               // 90
+    IntConst, 10,                           // 91
+    Int2Float,                              // 93
+    FloatDiv,                               // 94
+    Load, 6,                                // 95
+    FloatAdd,                               // 97
+    Store, 5,                               // 98
+    Load, 3,                                // 100
+    IntConst, 100,                          // 102
+    Int2Float,                              // 104
+    Load, 4,                                // 105
+    Load, 4,                                // 107
+    FloatMul,                               // 109
+    Load, 5,                                // 110
+    Load, 5,                                // 112
+    FloatMul,                               // 114
+    FloatAdd,                               // 115
+    IntConst, 1,                            // 116
+    Int2Float,                              // 118
+    FloatAdd,                               // 119
+    FloatMul,                               // 120
+    CallIn, 12,                             // 121
+    Load, 7,                                // 123
+    FloatAdd,                               // 125
+    CallIn, 10,                             // 126
+    FloatAdd,                               // 128
+    Store, 3,                               // 129
+    Load, 1,                                // 131
+    Load, 3,                                // 133
+    FloatConst, 1073741824,                 // 135
+    FloatDiv,                               // 137
+    Call, 196, 2, 0, 0, 0,                  // 138
+    Pop,                                    // 144
+    Load, 1,                                // 145
+    IntConst, 1,                            // 147
+    IntAdd,                                 // 149
+    Store, 1,                               // 150
+    Branch, -92,                            // 152
+    IntConst, 0,                            // 154
+    Return, 1,                              // 156
+    Load, -5,                               // 158
+    IntConst, 2,                            // 160
+    IntDiv,                                 // 162
+    GlobalStore, 0,                         // 163
+    GlobalLoad, 0,                          // 165
+    Store, 1,                               // 167
+    Load, 1,                                // 169
+    Load, -5,                               // 171
+    IntLt,                                  // 173
+    BranchFalse, 16,                        // 174
+    Load, 1,                                // 176
+    IntConst, 2,                            // 178
+    CallIn, 7,                              // 180
+    Pop,                                    // 182
+    Load, 1,                                // 183
+    IntConst, 1,                            // 185
+    IntAdd,                                 // 187
+    Store, 1,                               // 188
+    Branch, -23,                            // 190
+    IntConst, 0,                            // 192
+    Return, 1,                              // 194
+    Load, -6,                               // 196
+    IntConst, 255,                          // 198
+    CallIn, 1,                              // 200
+    Pop,                                    // 202
+    Load, -6,                               // 203
+    IntConst, 255,                          // 205
+    Int2Float,                              // 207
+    Load, -5,                               // 208
+    FloatConst, 1078530011,                 // 210
+    FloatMul,                               // 212
+    CallIn, 11,                             // 213
+    FloatMul,                               // 215
+    Float2Int,                              // 216
+    CallIn, 3,                              // 217
+    Pop,                                    // 219
+    Load, -6,                               // 220
+    IntConst, 255,                          // 222
+    Int2Float,                              // 224
+    Load, -5,                               // 225
+    FloatConst, 1078530011,                 // 227
+    FloatMul,                               // 229
+    CallIn, 10,                             // 230
+    FloatMul,                               // 232
+    Float2Int,                              // 233
+    CallIn, 5,                              // 234
+    Pop,                                    // 236
+    IntConst, 0,                            // 237
+    Return, 1,                              // 239
 };
 
 static internal_function fns[14] = { getR, setR, getG, setG, getB, setB, getW, setW, powFn, expFn, sinFn, cosFn, sqrtFn, setHSV };
